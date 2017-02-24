@@ -1,0 +1,11 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto+Mono:300");
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+canvas {
+  width: 100vw;
+  height: 100vh;
+}

@@ -1,0 +1,87 @@
+class Starfield {
+  constructor(elem, starCount, speed, fps) {
+    this.elem = elem;
+    this.ctx = this.elem.getContext('2d');
+    this.starCount = starCount || 500;
+    this.fps = fps || 25;
+    this.speed = speed || 0.25;
+
+    // Set up resizing
+    this.elem.width = this.elem.offsetWidth;
+    this.elem.height = this.elem.offsetHeight;
+    window.addEventListener('resize', () => this.resize());
+    
+    // Build a list of stars with X Y and Z coordinates
+    this.stars = [];
+    for (let i = 0; i < this.starCount; i++) {
+      this.stars.push(Starfield.getStar());
+    }
+
+    // Begin render loop
+    this.start();
+  }
+  
+  static getStar(back) {
+    return {
+      x: Math.random() * .165 - .0825,
+      y: Math.random() * .165 - .0825,
+      z: back ? 25 : Math.random() * 25,
+      text: String.fromCharCode(Math.floor(Math.random() * 96 + 33)),
+    };
+  }
+  
+  // When the window is resized, adjust canvas coordinate system
+  resize() {
+    this.elem.width = this.elem.offsetWidth;
+    this.elem.height = this.elem.offsetHeight;
+    this.draw();
+  }
+
+  // Render
+  draw() {
+    this.ctx.fillStyle = "black";
+    this.ctx.fillRect(0, 0, this.elem.width, this.elem.height);
+    
+    for (let i = 0; i < this.stars.length; i++) {
+      const star = this.stars[i];
+      const progress = (1 - star.z / 25);
+      const value = Math.round(progress * 255)
+      this.ctx.fillStyle = `rgb(${value}, ${value}, ${value})`;
+      this.ctx.font = `300 ${10 * progress + 4}px Roboto Mono`;
+      const size = 5 * progress;
+      
+      const absoluteX = star.x * this.elem.width;
+      const absoluteY = star.y * this.elem.height;
+      const projectedX = 100 / star.z * absoluteX;
+      const projectedY = 100 / star.z * absoluteY;
+      const finalX = projectedX + this.elem.width / 2;
+      const finalY = projectedY + this.elem.height / 2;
+
+      this.ctx.fillText(
+        star.text, finalX, finalY,
+      );
+      
+      star.z -= this.speed;
+      if (star.z < 0) {
+        this.stars[i] = Starfield.getStar(true);
+      }
+    }
+  }
+  
+  // Begin render loop
+  start() {
+    this.interval = setInterval(
+      () => this.draw(),
+      1000 / this.fps,
+    );
+  }
+  
+  // Pause render loop
+  stop() {
+    clearInterval(this.interval);
+  }
+}
+
+// Initialize a starfield
+const canvas = document.querySelector('canvas');
+window.stars = new Starfield(canvas, 5000);
