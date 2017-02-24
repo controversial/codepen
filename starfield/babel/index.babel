@@ -14,18 +14,30 @@ class Starfield {
     // Build a list of stars with X Y and Z coordinates
     this.stars = [];
     for (let i = 0; i < this.starCount; i++) {
-      this.stars.push(Starfield.getStar());
+      this.stars.push(this.getStar(false));
     }
 
     // Begin render loop
     this.start();
   }
   
-  static getStar(back) {
+  getStar(back) {
+    const rand = (low, high) => Math.random() * (high-low) + low;
+    const polToCart = (r, theta) => [
+      r * Math.cos(theta),
+      r * Math.sin(theta),
+    ];
+
+    const maxRadius = Math.min(this.elem.width, this.elem.height) / 4 / 2;
+    const pos = polToCart(
+      rand(maxRadius / 25, maxRadius),
+      rand(0, Math.PI * 2),
+    );
+
     return {
-      x: Math.random() * .165 - .0825,
-      y: Math.random() * .165 - .0825,
-      z: back ? 25 : Math.random() * 25,
+      x: pos[0],
+      y: pos[1],
+      z: back ? 25 : rand(0, 25),
       text: String.fromCharCode(Math.floor(Math.random() * 96 + 33)),
     };
   }
@@ -45,15 +57,12 @@ class Starfield {
     for (let i = 0; i < this.stars.length; i++) {
       const star = this.stars[i];
       const progress = (1 - star.z / 25);
-      const value = Math.round(progress * 255)
+      const value = Math.round(progress * 255);
       this.ctx.fillStyle = `rgb(${value}, ${value}, ${value})`;
-      this.ctx.font = `300 ${10 * progress + 4}px Roboto Mono`;
-      const size = 5 * progress;
-      
-      const absoluteX = star.x * this.elem.width;
-      const absoluteY = star.y * this.elem.height;
-      const projectedX = 100 / star.z * absoluteX;
-      const projectedY = 100 / star.z * absoluteY;
+      this.ctx.font = `300 ${progress * 20}px Roboto Mono`;
+
+      const projectedX = 100 / star.z * star.x;
+      const projectedY = 100 / star.z * star.y;
       const finalX = projectedX + this.elem.width / 2;
       const finalY = projectedY + this.elem.height / 2;
 
@@ -62,8 +71,12 @@ class Starfield {
       );
       
       star.z -= this.speed;
-      if (star.z < 0) {
-        this.stars[i] = Starfield.getStar(true);
+      if (star.z < 0 ||
+          finalX < 0 ||
+          finalY < 0 ||
+          finalX > this.elem.width ||
+          finalY > this.elem.height) {
+        this.stars[i] = this.getStar(true);
       }
     }
   }
@@ -71,7 +84,7 @@ class Starfield {
   // Begin render loop
   start() {
     this.interval = setInterval(
-      () => this.draw(),
+      () => requestAnimationFrame(() => this.draw()),
       1000 / this.fps,
     );
   }
@@ -84,4 +97,4 @@ class Starfield {
 
 // Initialize a starfield
 const canvas = document.querySelector('canvas');
-window.stars = new Starfield(canvas, 5000);
+window.stars = new Starfield(canvas, 1500, 0.1, 25);

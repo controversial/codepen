@@ -24,18 +24,28 @@ var Starfield = function () {
     // Build a list of stars with X Y and Z coordinates
     this.stars = [];
     for (var i = 0; i < this.starCount; i++) {
-      this.stars.push(Starfield.getStar());
+      this.stars.push(this.getStar(false));
     }
 
     // Begin render loop
     this.start();
   }
 
-  Starfield.getStar = function getStar(back) {
+  Starfield.prototype.getStar = function getStar(back) {
+    var rand = function rand(low, high) {
+      return Math.random() * (high - low) + low;
+    };
+    var polToCart = function polToCart(r, theta) {
+      return [r * Math.cos(theta), r * Math.sin(theta)];
+    };
+
+    var maxRadius = Math.min(this.elem.width, this.elem.height) / 4 / 2;
+    var pos = polToCart(rand(maxRadius / 25, maxRadius), rand(0, Math.PI * 2));
+
     return {
-      x: Math.random() * .165 - .0825,
-      y: Math.random() * .165 - .0825,
-      z: back ? 25 : Math.random() * 25,
+      x: pos[0],
+      y: pos[1],
+      z: back ? 25 : rand(0, 25),
       text: String.fromCharCode(Math.floor(Math.random() * 96 + 33))
     };
   };
@@ -59,21 +69,18 @@ var Starfield = function () {
       var progress = 1 - star.z / 25;
       var value = Math.round(progress * 255);
       this.ctx.fillStyle = 'rgb(' + value + ', ' + value + ', ' + value + ')';
-      this.ctx.font = '300 ' + (10 * progress + 4) + 'px Roboto Mono';
-      var size = 5 * progress;
+      this.ctx.font = '300 ' + progress * 20 + 'px Roboto Mono';
 
-      var absoluteX = star.x * this.elem.width;
-      var absoluteY = star.y * this.elem.height;
-      var projectedX = 100 / star.z * absoluteX;
-      var projectedY = 100 / star.z * absoluteY;
+      var projectedX = 100 / star.z * star.x;
+      var projectedY = 100 / star.z * star.y;
       var finalX = projectedX + this.elem.width / 2;
       var finalY = projectedY + this.elem.height / 2;
 
       this.ctx.fillText(star.text, finalX, finalY);
 
       star.z -= this.speed;
-      if (star.z < 0) {
-        this.stars[i] = Starfield.getStar(true);
+      if (star.z < 0 || finalX < 0 || finalY < 0 || finalX > this.elem.width || finalY > this.elem.height) {
+        this.stars[i] = this.getStar(true);
       }
     }
   };
@@ -84,7 +91,9 @@ var Starfield = function () {
     var _this2 = this;
 
     this.interval = setInterval(function () {
-      return _this2.draw();
+      return requestAnimationFrame(function () {
+        return _this2.draw();
+      });
     }, 1000 / this.fps);
   };
 
@@ -100,4 +109,4 @@ var Starfield = function () {
 // Initialize a starfield
 
 var canvas = document.querySelector('canvas');
-window.stars = new Starfield(canvas, 5000);
+window.stars = new Starfield(canvas, 1500, 0.1, 25);
