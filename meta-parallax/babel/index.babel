@@ -1,0 +1,37 @@
+const codeBlock = document.getElementById('codeBlock');
+
+// Set the contents of the <code> block to the source of this script
+codeBlock.textContent = document.currentScript.textContent;
+
+// syntax-highlight the source
+hljs.highlightBlock(codeBlock);
+
+for (let i = 0; i < codeBlock.childNodes.length; i++) {
+  let node = codeBlock.childNodes[i];
+  // Wrap Text nodes in spans
+  if (node instanceof Text) {
+    const newSpan = document.createElement('span');
+    newSpan.textContent = node.textContent;
+    codeBlock.replaceChild(newSpan, node);
+    node = newSpan;
+  }
+
+  // Enable parallax
+  node.classList.add('layer');
+  node.setAttribute('data-depth', Math.random());
+  
+  // Position absolutely
+  const rect = node.getBoundingClientRect();
+  node.setAttribute('data-top', rect.top);
+  node.setAttribute('data-left', rect.left);
+} 
+
+for (let i = 0; i < codeBlock.childNodes.length; i++) {
+  const node = codeBlock.childNodes[i];
+  node.style.marginTop = node.getAttribute('data-top') + 'px';
+  node.style.marginLeft = node.getAttribute('data-left') + 'px';
+}
+
+const parallax = new Parallax(codeBlock, {
+  pointerEvents: false,
+});
