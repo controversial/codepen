@@ -1,0 +1,9 @@
+'use strict';
+
+var codeBlock = document.getElementById('codeBlock');
+
+// Set the contents of the <code> block to the source of this script
+codeBlock.textContent = document.currentScript.textContent;
+
+// syntax-highlight the source
+hljs.highlightBlock(codeBlock);
