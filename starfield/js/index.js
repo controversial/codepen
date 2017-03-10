@@ -10,20 +10,20 @@ var Starfield = function () {
 
     this.elem = elem;
     this.ctx = this.elem.getContext('2d');
-    this.starCount = starCount || 500;
-    this.fps = fps || 25;
-    this.speed = speed || 0.25;
+    this.starCount = starCount || 2000;
+    this.fps = fps || 60;
+    this.speed = speed || 1;
 
     // Set up resizing
-    this.elem.width = this.elem.offsetWidth;
-    this.elem.height = this.elem.offsetHeight;
+    this.elem.width = window.innerWidth;
+    this.elem.height = window.innerHeight;
     window.addEventListener('resize', function () {
       return _this.resize();
     });
 
     // Build a list of stars with X Y and Z coordinates
     this.stars = [];
-    for (var i = 0; i < this.starCount; i++) {
+    for (var i = 0; i < this.starCount; i += 1) {
       this.stars.push(this.getStar(false));
     }
 
@@ -45,40 +45,37 @@ var Starfield = function () {
     return {
       x: pos[0],
       y: pos[1],
-      z: back ? 25 : rand(0, 25),
-      text: String.fromCharCode(Math.floor(Math.random() * 96 + 33))
+      z: back ? 25 : rand(0, 25)
     };
   };
 
   // When the window is resized, adjust canvas coordinate system
 
   Starfield.prototype.resize = function resize() {
-    this.elem.width = this.elem.offsetWidth;
-    this.elem.height = this.elem.offsetHeight;
+    this.elem.width = window.innerWidth;
+    this.elem.height = window.innerHeight;
     this.draw();
   };
 
   // Render
 
   Starfield.prototype.draw = function draw() {
-    this.ctx.fillStyle = "black";
-    this.ctx.fillRect(0, 0, this.elem.width, this.elem.height);
+    this.ctx.clearRect(0, 0, this.elem.width, this.elem.height);
 
-    for (var i = 0; i < this.stars.length; i++) {
+    for (var i = 0; i < this.stars.length; i += 1) {
       var star = this.stars[i];
       var progress = 1 - star.z / 25;
-      var value = Math.round(progress * 255);
-      this.ctx.fillStyle = 'rgb(' + value + ', ' + value + ', ' + value + ')';
-      this.ctx.font = '300 ' + progress * 20 + 'px Roboto Mono';
+      var lightness = Math.round(progress * 255);
+      this.ctx.fillStyle = 'rgb(' + lightness + ', ' + lightness + ', ' + lightness + ')';
 
       var projectedX = 100 / star.z * star.x;
       var projectedY = 100 / star.z * star.y;
       var finalX = projectedX + this.elem.width / 2;
       var finalY = projectedY + this.elem.height / 2;
 
-      this.ctx.fillText(star.text, finalX, finalY);
+      this.ctx.fillRect(finalX, finalY, 5 * progress, 5 * progress);
 
-      star.z -= this.speed;
+      star.z -= this.speed / 20;
       if (star.z < 0 || finalX < 0 || finalY < 0 || finalX > this.elem.width || finalY > this.elem.height) {
         this.stars[i] = this.getStar(true);
       }
@@ -106,7 +103,5 @@ var Starfield = function () {
   return Starfield;
 }();
 
-// Initialize a starfield
-
 var canvas = document.querySelector('canvas');
-window.stars = new Starfield(canvas, 1500, 0.1, 25);
+window.stars = new Starfield(canvas);
