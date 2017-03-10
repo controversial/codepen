@@ -10,4 +10,4 @@ This repository excludes some pens that are incorporated into other repositories
 - [CSS Laptop](https://codepen.io/controversial/pen/JKgpwp): Drawing a laptop with CSS and HTML
 - [Meta](https://codepen.io/controversial/pen/ZeEpmZ): displaying a highlighted version of this pen's JS
 - [Meta Parallax](https://codepen.io/controversial/pen/ZeEpmZ): displays a highlighted version of this pen's JS code, then breaks it up into sections by highlighting and moves the sections in parallax with mouse/device motion
-- [Starfield](http://codepen.io/controversial/pen/yMMGZq/): Zooming through a 3D "starfield" of characters
+- [Starfield](https://codepen.io/controversial/pen/yMMGZq): Zooming through a 3D "starfield" of characters
