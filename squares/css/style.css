@@ -18,6 +18,10 @@ div {
   font-family: sans-serif;
 }
 
+input {
+  -webkit-appearance: none;
+  background: transparent;
+}
 input::-webkit-slider-runnable-track {
   height: 2px;
   background-color: #fff;
