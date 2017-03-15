@@ -11,3 +11,4 @@ This repository excludes some pens that are incorporated into other repositories
 - [Meta](https://codepen.io/controversial/pen/ZeEpmZ): displaying a highlighted version of this pen's JS
 - [Meta Parallax](https://codepen.io/controversial/pen/ZeEpmZ): displays a highlighted version of this pen's JS code, then breaks it up into sections by highlighting and moves the sections in parallax with mouse/device motion
 - [Starfield](https://codepen.io/controversial/pen/yMMGZq): Zooming through a 3D "starfield" of characters
+- [Squares](http://codepen.io/controversial/pen/bqrRWx): Cool animation inspired by a [@beesandbombs](https://dribbble.com/beesandbombs) animation

@@ -1,0 +1,26 @@
+canvas
+  background-color: black
+  width: 100vw
+  height: 100vh
+  position: fixed
+  top: 0
+  left: 0
+  z-index: 0
+
+div
+  position: fixed
+  z-index: 1
+  top: 1vh
+  left: 1vh
+  color: white
+  font-size: 20px
+  font-family: sans-serif
+
+input
+  &::-webkit-slider-runnable-track
+    height: 2px
+    background-color: #fff
+    transform: translateY(-5px)
+
+  &::-webkit-slider-thumb
+    transform: translateY(calc(-50% + 1px))
