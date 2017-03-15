@@ -55,7 +55,7 @@ function redraw() {
 
   var size = Math.min(canvas.width * (2 / 3), canvas.height * (2 / 3));
 
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
 
   // Draw first rectangle
   ctx.beginPath();
@@ -91,7 +91,8 @@ window.dispatchEvent(new Event('resize'));
 angleRange.dispatchEvent(new Event('input'));
 
 function step() {
-  angle += 0.25;
+  // Adjust the angle different amounts based on distance from 90° so that the animation moves more slowly when it's lined up as cooler patterns
+  angle += (Math.min(angle, 90 - angle) + 2) / 100;
   angle %= 90;
   redraw();
 }
