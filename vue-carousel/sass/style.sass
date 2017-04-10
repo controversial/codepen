@@ -1,0 +1,26 @@
+*,
+*::before,
+*::after
+  box-sizing: border-box
+
+body
+  margin: 0
+
+.carousel
+  background-color: #ddd
+  height: 100vh
+  position: relative
+  
+  & > div
+    background-color: #000
+    color: #fff
+    width: 10vw
+    height: 10vw
+    position: absolute
+    top: 50%
+    left: 50%
+    transform: translate(-50%, -50%)
+    text-align: center
+    line-height: 10vw
+    font-family: sans-serif
+    font-size: 6vw
