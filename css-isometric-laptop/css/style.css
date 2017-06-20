@@ -1,0 +1,136 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #333;
+  color: white;
+  font-family: sans-serif;
+  -webkit-perspective: 3000px;
+          perspective: 3000px;
+}
+
+.laptop3d {
+  position: absolute;
+  top: 35vw;
+  left: 20vw;
+  -webkit-transform: rotateZ(60deg) rotateX(30deg) rotateY(-45deg) translateX(0px);
+          transform: rotateZ(60deg) rotateX(30deg) rotateY(-45deg) translateX(0px);
+  -webkit-transform-style: preserve-3d;
+          transform-style: preserve-3d;
+}
+.laptop3d .base {
+  position: relative;
+}
+.laptop3d .base .top {
+  width: 60vw;
+  height: 40vw;
+  background: -webkit-linear-gradient(top left, #FBFBFC, #A8A8AD);
+  background: linear-gradient(to bottom right, #FBFBFC, #A8A8AD);
+}
+.laptop3d .base .left {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60vw;
+  height: 2vw;
+  background: -webkit-linear-gradient(top left, #C3C4C9, #A8A8AD);
+  background: linear-gradient(to bottom right, #C3C4C9, #A8A8AD);
+  -webkit-transform-origin: top;
+          transform-origin: top;
+  -webkit-transform: translateY(40vw) rotateX(-90deg);
+          transform: translateY(40vw) rotateX(-90deg);
+}
+.laptop3d .base .right {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40vw;
+  height: 2vw;
+  background: -webkit-linear-gradient(left, #EDEDF2, #BABBC0);
+  background: linear-gradient(to right, #EDEDF2, #BABBC0);
+  border-radius: 0 0 1vw 0;
+  -webkit-transform-origin: top left;
+          transform-origin: top left;
+  -webkit-transform: translateY(40vw) translateX(60vw) rotateX(-90deg) rotateY(90deg);
+          transform: translateY(40vw) translateX(60vw) rotateX(-90deg) rotateY(90deg);
+}
+.laptop3d .lid {
+  -webkit-transform-origin: 0 40vw;
+          transform-origin: 0 40vw;
+  -webkit-transform: translateY(-80vw) rotateX(-90deg);
+          transform: translateY(-80vw) rotateX(-90deg);
+  -webkit-transform-style: preserve-3d;
+          transform-style: preserve-3d;
+  -webkit-transition: -webkit-transform 1s;
+  transition: -webkit-transform 1s;
+  transition: transform 1s;
+  transition: transform 1s, -webkit-transform 1s;
+}
+.laptop3d .lid.closed {
+  -webkit-transform: translateY(-80vw) rotateX(-180deg);
+          transform: translateY(-80vw) rotateX(-180deg);
+}
+.laptop3d .lid .front {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60vw;
+  height: 40vw;
+  background: black;
+  border: 0.3vw solid;
+  -o-border-image: linear-gradient(to bottom right, #C3C4C9, #A8A8AD);
+     border-image: -webkit-linear-gradient(top left, #C3C4C9, #A8A8AD);
+     border-image: linear-gradient(to bottom right, #C3C4C9, #A8A8AD);
+  border-image-slice: 1;
+}
+.laptop3d .lid .front .screen {
+  position: absolute;
+  background: url(https://source.unsplash.com/random);
+  background-size: cover;
+  top: 1.5vw;
+  left: 1.5vw;
+  right: 1.5vw;
+  bottom: 2.25vw;
+}
+.laptop3d .lid .back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60vw;
+  height: 40vw;
+  background: -webkit-linear-gradient(bottom left, #FBFBFC, #A8A8AD);
+  background: linear-gradient(to top right, #FBFBFC, #A8A8AD);
+  -webkit-transform: translateZ(-1.5vw);
+          transform: translateZ(-1.5vw);
+}
+.laptop3d .lid .top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60vw;
+  height: 1.5vw;
+  background: -webkit-linear-gradient(top left, #C3C4C9, #A8A8AD);
+  background: linear-gradient(to bottom right, #C3C4C9, #A8A8AD);
+  -webkit-transform-origin: top;
+          transform-origin: top;
+  -webkit-transform: rotateX(-90deg);
+          transform: rotateX(-90deg);
+}
+.laptop3d .lid .right {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40vw;
+  height: 1.5vw;
+  background: -webkit-linear-gradient(right, #EDEDF2, #BABBC0);
+  background: linear-gradient(to left, #EDEDF2, #BABBC0);
+  -webkit-transform-origin: top right;
+          transform-origin: top right;
+  -webkit-transform: rotateX(-90deg) rotateY(90deg);
+          transform: rotateX(-90deg) rotateY(90deg);
+}
+
+.grid {
+  background-image: url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/750152/grid15.png");
+}

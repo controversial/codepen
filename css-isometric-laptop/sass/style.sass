@@ -1,0 +1,112 @@
+*
+  box-sizing: border-box
+
+body
+  background-color: #333
+  color: white
+  font-family: sans-serif
+  perspective: 3000px
+
+
+$length: 60vw
+$width: 40vw
+$height: 2vw
+
+.laptop3d
+  position: absolute
+  top: 55vw - ($width / 2)
+  left: 50vw - ($length / 2)
+  transform: rotateZ(60deg) rotateX(30deg) rotateY(-45deg) translateX(0px)
+  transform-style: preserve-3d
+
+  .base
+    position: relative
+
+    .top
+      width: $length
+      height: $width
+      background: linear-gradient(to bottom right, #FBFBFC, #A8A8AD)
+
+    .left
+      position: absolute
+      top: 0
+      left: 0
+      width: $length
+      height: $height
+      background: linear-gradient(to bottom right, #C3C4C9, #A8A8AD)
+      transform-origin: top
+      transform: translateY($width) rotateX(-90deg)
+
+    .right
+      position: absolute
+      top: 0
+      left: 0
+      width: $width
+      height: $height
+      background: linear-gradient(to right, #EDEDF2, #BABBC0)
+      border-radius: 0 0 1vw 0
+      transform-origin: top left
+      transform: translateY($width) translateX($length) rotateX(-90deg) rotateY(90deg)
+
+  .lid
+    transform-origin: 0 $width
+    transform: translateY(-2 * $width) rotateX(-90deg)
+    transform-style: preserve-3d
+    transition: transform 1s
+    
+    &.closed
+      transform: translateY(-2 * $width) rotateX(-180deg)
+
+    .front
+      position: absolute
+      top: 0
+      left: 0
+      width: $length
+      height: $width
+      background: black
+      border: .3vw solid
+      border-image: linear-gradient(to bottom right, #C3C4C9, #A8A8AD)
+      border-image-slice: 1
+      
+      .screen
+        position: absolute
+        background: url(https://source.unsplash.com/random)
+        background-size: cover
+        $screen-bezel: 1.5vw
+        top: $screen-bezel
+        left: $screen-bezel
+        right: $screen-bezel
+        bottom: $screen-bezel * 1.5
+
+    .back
+      position: absolute
+      top: 0
+      left: 0
+      width: $length
+      height: $width
+      background: linear-gradient(to top right, #FBFBFC, #A8A8AD)
+      transform: translateZ(-$height * 0.75)
+
+    .top
+      position: absolute
+      top: 0
+      left: 0
+      width: $length
+      height: $height * 0.75
+      background: linear-gradient(to bottom right, #C3C4C9, #A8A8AD)
+      transform-origin: top
+      transform: rotateX(-90deg)
+
+    .right
+      position: absolute
+      top: 0
+      right: 0
+      width: $width
+      height: $height * 0.75
+      background: linear-gradient(to left, #EDEDF2, #BABBC0)
+      transform-origin: top right
+      transform: rotateX(-90deg) rotateY(90deg)
+      
+
+.grid
+  background-image: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/750152/grid15.png')

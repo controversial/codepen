@@ -1,0 +1,13 @@
+const laptop = document.getElementById('a');
+
+function move() {
+  for (let i = 0; i < 3000; i++)
+    setTimeout(() => { laptop.style.transform = `rotateZ(60deg) rotateX(30deg) rotateY(-45deg) translateX(${i < 1500 ? i : -3000 + i}px)` }, i);
+}
+
+function close() {
+  laptop.querySelector('.lid').classList.toggle('closed');
+}
+
+laptop.addEventListener('click', close);
+laptop.addEventListener('contextmenu', (e) => { e.preventDefault(); move(); });
