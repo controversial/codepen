@@ -1,0 +1,19 @@
+body {
+  margin: 0;
+  background-color: black;
+}
+
+canvas {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+}
+
+.controls {
+  color: white;
+  background: rgba(255, 255, 255, 0.25);
+  position: fixed;
+}
+.controls input {
+  width: 25vw;
+}
