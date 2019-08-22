@@ -1,0 +1,83 @@
+const colors = [
+  '#8fbcbb',
+  '#88c0d0',
+  '#81a1c1',
+  '#5e81ac',
+  '#4c566a',
+  '#2e3440',
+];
+
+const numLines = 30;
+class CodeBlock {
+  static get height() { return 6 * window.devicePixelRatio; }
+  static get speed() { return 200 * window.devicePixelRatio; }
+
+  constructor(x, width, canvas) {
+    this.canvas = canvas;
+    this.x = x; this.width = width;
+    this.startTime = new Date();
+    this.color = colors[Math.floor(Math.random() * colors.length)];
+  }
+  get delta() { return (new Date() - this.startTime) / 1000; }
+  get y() { return this.canvas.height - this.delta * CodeBlock.speed; }
+  get offScreen() { return this.y < -CodeBlock.height; }
+  
+  draw(ctx) {
+    ctx.fillStyle = this.color;
+    ctx.fillRect(this.x, this.y, this.width, CodeBlock.height);
+  }
+}
+
+class Animation {
+  constructor(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.rows = []; this.addRow();
+    this.resize();
+    window.addEventListener('resize', () => this.resize());
+    
+    this.start();
+  }
+
+  resize() {
+    this.canvas.width = this.canvas.offsetWidth * window.devicePixelRatio;
+    this.canvas.height = this.canvas.offsetHeight * window.devicePixelRatio;
+    this.draw();
+  }
+  
+  start() {
+    this.interval = setInterval(() => requestAnimationFrame(() => this.draw()), 1000/60);
+  }
+  stop() {
+    clearInterval(this.interval);
+  }
+  
+  
+  
+  
+  addRow() {
+    const row = [];
+    const dpr = window.devicePixelRatio || 1;
+    const horizGap = 4 * dpr;;
+    const indent = (15 + Math.round(Math.random()) * 20) * dpr;
+    for (let i = 0; i < Math.floor(Math.random() * 5 + 1); i++) {
+      const newX = indent + row.map(block => block.width + horizGap).reduce((a, b) => a + b, 0);
+      const width = Math.floor(Math.random() * 50 + 5) * dpr;
+      row.push(new CodeBlock(newX, width, this.canvas));
+    }
+    this.rows.push(row);
+  }
+  get blocks() { return [].concat(...this.rows); }
+  get bottomRow() { return this.rows.slice(-1)[0]; }
+  
+  draw() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.rows = this.rows.filter(r => !r[0].offScreen);
+    const gap = 5 * (window.devicePixelRatio || 1);
+    if (!this.bottomRow || this.bottomRow[0].y < this.canvas.height - (CodeBlock.height + gap)) this.addRow();
+    this.blocks.forEach(b => b.draw(this.ctx));
+  }
+}
+
+const anim = new Animation(document.querySelector('canvas'));
