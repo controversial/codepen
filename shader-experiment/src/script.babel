@@ -1,3 +1,47 @@
+const NUM_PARTICLES = 100;
+
+// Averages multiple random values to simulate gaussian distribution. Higher values of n result in
+// a tighter focus.
+function gaussRand(samples = 6) {
+  let rand = 0;
+  for (let i = 0; i < samples; i += 1) rand += Math.random();
+  return rand / samples;
+}
+
+
+// PARTICLE ENGINE
+
+class Particle {
+  constructor() {
+    // Mechanical properties
+    this.startProgress = Math.random();     // starting position from 0 to 1
+    this.speed = Math.random() * .25 + .05; // speed from .05 to .30
+    this.frequency = 1;                     // every particle completes 1 cycle
+    this.amplitude = gaussRand(10) * .2;    // amplitude from 0 to .2
+    this.yShift = gaussRand(20) * .5 - .25; // vertical shift from -.25 to .25
+    // Visual properties
+    this.opacity = Math.random() * .5 + .25;        // opacity from .25 to .75
+    this.size = Math.floor(Math.random() * 10 + 5); // size from 5px to 20px
+  }
+  
+  position(time) {
+    const progress = (this.startProgress + (time * this.speed)) % 1;
+    return [
+      // Go off front and back edge of screen a bit
+      progress * 1.1 - 0.05,
+      0.5 + this.yShift + (this.amplitude * Math.sin(progress * 2 * Math.PI)),
+    ];
+  }
+}
+
+
+
+
+// RENDERING ENGINE
+
+
+
+
 const vertexShader = `
 void main() {
     gl_Position = vec4(position, 1.0);
@@ -5,56 +49,16 @@ void main() {
 `;
 
 const fragmentShader = `
-#ifdef GL_ES
-precision lowp float;
-#endif
-
 #define PI 3.141592653
 
 uniform vec2 u_resolution;
 uniform float u_time;
-
-
-float random(float seed) { return fract(sin(seed) * 100000.); }
-
-
-const int numParticles = 50;
-vec4 particles[numParticles];
-
-bool has_setup = false;
-void setup() {
-  for (int i = 0; i < numParticles; i++) {
-    float seed = float(i);
-    particles[i] = vec4(
-      random(seed + .1),            // opacity
-      random(seed + .2) * 20. + 5., // speed
-      random(seed + .3) * .15,      // amplitude
-      random(seed + .8) * .3 - .15  // y shift
-    );
-    // startProgress is given by (i/numParticles)
-    // Where does radius come from?
-  }
-  has_setup = true;
-}
-
-
-vec2 particlePos(vec4 particle, int index, float time) {
-  float this_startProgress = float(index) / float(numParticles);
-  float this_speed = particle[1];
-  float this_amplitude = particle[2];
-  float this_yshift = particle[3];
-  float progress = fract(this_startProgress + (time / 4.));
-
-  return vec2(
-    progress * 1.1 - 0.05, // go off left and right edge a little bit
-    0.5 + this_yshift + (this_amplitude * sin(progress * 2. * PI))
-  ) * u_resolution;
-}
+const int num_particles = ${NUM_PARTICLES};
+uniform vec2 u_particles_pos[num_particles];
+uniform vec2 u_particles_attr[num_particles];
 
 
 void main() {
-  if (!has_setup) setup();
-
   vec3 color = vec3(0., 0., 0.);
 
   float radius;
@@ -62,10 +66,10 @@ void main() {
   vec2 center;
   float inCircle;
 
-  for (int i = 0; i < numParticles; i += 1) {
-    radius = 20.;
-    opacity = particles[i][0];
-    center = particlePos(particles[i], i, u_time);
+  for (int i = 0; i < num_particles; i += 1) {
+    radius = u_particles_attr[i][1];
+    opacity = u_particles_attr[i][0];
+    center = u_particles_pos[i] * u_resolution;
     inCircle = smoothstep(radius - 1., radius + 1., distance(center, gl_FragCoord.xy));
     color += mix(
       vec3(opacity, opacity, opacity),
@@ -80,9 +84,13 @@ void main() {
 
 
 
-
-class Renderer {
-  constructor(container) {
+class ParticleRenderer {
+  constructor(container, numParticles) {
+    // Set up particles
+    this.particles = new Array(numParticles)
+      .fill(null)
+      .map(p => new Particle());
+    
     // Set up scene
 
     this.scene = new THREE.Scene();
@@ -92,6 +100,12 @@ class Renderer {
     this.uniforms = {
       u_time: { type: "f", value: 0.0 },
       u_resolution: { type: "v2", value: new THREE.Vector2() },
+
+      u_particles_pos: { type: "v2v", value: this.particles.map(p => new THREE.Vector2()) },
+      u_particles_attr: {
+        type: "v2v",
+        value: this.particles.map(({ opacity, size }) => new THREE.Vector2(opacity, size)),
+      }
     };
     const material = new THREE.ShaderMaterial({
       uniforms: this.uniforms,
@@ -124,7 +138,7 @@ class Renderer {
     // Misc
 
     this.startTime = 0;
-    this.resize();
+    setTimeout(() => this.resize(), 50);
     window.addEventListener('resize', () => this.resize());
   }
 
@@ -146,6 +160,9 @@ class Renderer {
   
   render() {
     this.uniforms.u_time.value = this.elapsedTime;
+    this.uniforms.u_particles_pos.value = this.particles
+      .map(p => new THREE.Vector2(...p.position(this.elapsedTime)));
+
     this.stats.update();
 
     this.renderer.render(this.scene, this.camera);
@@ -155,5 +172,5 @@ class Renderer {
 }
 
 
-const renderer = new Renderer(document.getElementById('container'));
+const renderer = new ParticleRenderer(document.getElementById('container'), NUM_PARTICLES);
 renderer.render();
