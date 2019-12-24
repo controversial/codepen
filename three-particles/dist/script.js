@@ -94,6 +94,7 @@ class ParticleRenderer {
   resize() {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.camera.aspect = this.renderer.domElement.width / this.renderer.domElement.height;
+    this.camera.updateProjectionMatrix();
   }
 
   get elapsedTime() {
