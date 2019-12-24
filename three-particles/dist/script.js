@@ -43,6 +43,22 @@ class Particle {
 
 
 
+const cameraDistance = 2.5;
+
+const vertexShader = `
+void main() {
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    gl_PointSize = 10. * (${cameraDistance} / -mvPosition.z);
+    gl_Position = projectionMatrix * mvPosition;
+}
+`;
+
+const fragmentShader = `
+void main() {
+    gl_FragColor = vec4(1., 1., 1., .25);
+}
+`;
+
 
 class ParticleRenderer {
   constructor(container, numParticles) {
@@ -58,12 +74,15 @@ class ParticleRenderer {
     const initialPositions = this.particles.flatMap(p => p.position(0).map(c => c * 2 - 1));
     this.points.setAttribute(
     'position',
-    new THREE.BufferAttribute(
-    Float32Array.from(initialPositions),
-    3));
-
+    new THREE.BufferAttribute(Float32Array.from(initialPositions), 3));
     // Define material
-    const material = new THREE.PointsMaterial({ size: .025, color: 0xFFFFFF, opacity: .25, transparent: true });
+    const material = new THREE.ShaderMaterial({
+      uniforms: {},
+      vertexShader,
+      fragmentShader,
+      depthTest: false,
+      transparent: true });
+
     material.depthWrite = false;
     // Create points system from vertices and material
     this.system = new THREE.Points(this.points, material);
@@ -73,7 +92,7 @@ class ParticleRenderer {
     // Set up camera
 
     this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 10000);
-    this.camera.position.z = 2.5;
+    this.camera.position.z = cameraDistance;
 
     // Set up renderer
 
