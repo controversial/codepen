@@ -19,7 +19,6 @@ class Particle {
     this.frequency = 1; // every particle completes 1 cycle
     this.amplitude = gaussRand(7) * .2; // amplitude from 0 to 0.2
     this.yShift = gaussRand(20) * .6 - .3; // vertical shift from -0.3 to 0.3
-    this.z = gaussRand() * .5 - .25; // z position from -0.25 to 0.25
     // Visual properties
     this.opacity = Math.random() * .5 + .15; // opacity from 0.15 to 0.65
     this.size = (Math.random() ** 2 * 5 + 4) * // size from 4px to 9px (focused lower)
@@ -31,7 +30,7 @@ class Particle {
     return [
     progress,
     0.5 + this.yShift + this.amplitude * Math.sin(progress * this.frequency * 2 * Math.PI),
-    this.z];
+    0];
 
   }}
 
