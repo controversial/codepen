@@ -1,4 +1,4 @@
-NUM_PARTICLES = 40000;
+NUM_PARTICLES = 2500;
 
 // Averages multiple random values to simulate gaussian distribution. Higher values of n result in
 // a tighter focus.
@@ -54,10 +54,14 @@ class ParticleRenderer {
     fill(null).
     map(() => new Particle());
     // Create three.js vertices from particles
-    this.points = new THREE.Geometry();
-    this.points.vertices = this.particles.
-    map(p => new THREE.Vector3(...p.position(0).map(c => c * 2 - 1)));
-    this.points.dynamic = true;
+    this.points = new THREE.BufferGeometry();
+    const initialPositions = this.particles.flatMap(p => p.position(0).map(c => c * 2 - 1));
+    this.points.setAttribute(
+    'position',
+    new THREE.BufferAttribute(
+    Float32Array.from(initialPositions),
+    3));
+
     // Define material
     const material = new THREE.PointsMaterial({ size: .025, color: 0xFFFFFF, opacity: .25, transparent: true });
     material.depthWrite = false;
@@ -111,13 +115,8 @@ class ParticleRenderer {
     this.stats.update();
     const time = this.elapsedTime;
 
-    this.points.vertices.
-    forEach((particle, i) => {
-      particle.fromArray(this.particles[i].position(this.elapsedTime).map(c => c * 2 - 1));
-    });
-    this.points.verticesNeedUpdate = true;
-
-    // this.system.rotation.y += 0.01;
+    const positions = Float32Array.from(this.particles.flatMap(p => p.position(this.elapsedTime).map(c => c * 2 - 1)));
+    this.points.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
     this.renderer.render(this.scene, this.camera);
 

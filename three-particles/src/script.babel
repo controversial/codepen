@@ -1,4 +1,4 @@
-NUM_PARTICLES = 40000;
+NUM_PARTICLES = 2500;
 
 // Averages multiple random values to simulate gaussian distribution. Higher values of n result in
 // a tighter focus.
@@ -24,7 +24,7 @@ class Particle {
     this.opacity = Math.random() * .5 + .25;        // opacity from .25 to .75
     this.size = Math.floor(Math.random() * 10 + 5); // size from 5px to 20px
   }
-  
+
   position(time) {
     const progress = (this.startProgress + (time * this.speed)) % 1;
     return [
@@ -54,10 +54,15 @@ class ParticleRenderer {
       .fill(null)
       .map(() => new Particle());
     // Create three.js vertices from particles
-    this.points = new THREE.Geometry();
-    this.points.vertices = this.particles
-      .map(p => new THREE.Vector3(...p.position(0).map(c => c * 2 - 1)));
-    this.points.dynamic = true;
+    this.points = new THREE.BufferGeometry();
+    const initialPositions = this.particles.flatMap(p => p.position(0).map(c => c * 2 - 1));
+    this.points.setAttribute(
+      'position',
+      new THREE.BufferAttribute(
+        Float32Array.from(initialPositions),
+        3,
+      ),
+    );
     // Define material
     const material = new THREE.PointsMaterial({ size: .025, color: 0xFFFFFF, opacity: .25, transparent: true });
     material.depthWrite = false;
@@ -76,7 +81,7 @@ class ParticleRenderer {
     this.renderer = new THREE.WebGLRenderer({ alpha: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);
     container.appendChild(this.renderer.domElement);
-    
+
     // Set up stats
 
     this.stats = new Stats();
@@ -106,19 +111,14 @@ class ParticleRenderer {
     // Subsequent calls
     return (new Date() - this.startTime) / 1000;
   }
-  
+
   render() {
     this.stats.update();
     const time = this.elapsedTime;
 
-    this.points.vertices
-      .forEach((particle, i) => {
-        particle.fromArray(this.particles[i].position(this.elapsedTime).map(c => (c * 2 - 1)));
-      });
-    this.points.verticesNeedUpdate = true;
+    const positions = Float32Array.from(this.particles.flatMap(p => p.position(this.elapsedTime).map(c => c * 2 - 1)));
+    this.points.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
-    // this.system.rotation.y += 0.01;
-    
     this.renderer.render(this.scene, this.camera);
 
     requestAnimationFrame(() => this.render());
