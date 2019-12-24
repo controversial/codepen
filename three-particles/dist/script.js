@@ -21,7 +21,7 @@ class Particle {
     this.yShift = gaussRand(20) * .6 - .3; // vertical shift from -0.3 to 0.3
     // Visual properties
     this.opacity = Math.random() * .5 + .15; // opacity from 0.15 to 0.65
-    this.size = (Math.random() * 6 + 1) // size from 1px to 7px
+    this.size = (Math.random() * 6 + 1) * // size from 1px to 7px
     window.devicePixelRatio; // same size range on all screens
   }
 
@@ -82,13 +82,10 @@ class ParticleRenderer {
     this.particles = new Array(numParticles).
     fill(null).
     map(() => new Particle());
-    // Create three.js vertices from particles
+    // Create geometry from particles
     this.points = new THREE.BufferGeometry();
-    const initialPositions = this.particles.flatMap(p => p.position(0).map(c => c * 2 - 1));
-    this.points.setAttribute(
-    'position',
-    new THREE.BufferAttribute(Float32Array.from(initialPositions), 3));
-
+    this.points.setAttribute('position',
+    new THREE.BufferAttribute(this._getParticlePositions(0), 3));
     const sizes = new Float32Array(this.particles.length);
     const opacities = new Float32Array(this.particles.length);
     this.particles.forEach((p, i) => {
@@ -152,11 +149,29 @@ class ParticleRenderer {
     return (new Date() - this.startTime) / 1000;
   }
 
+  // Get the final position in 3D space for each particle at a given time
+  // Returns a Float32Array suitable for direct use in a THREE.BufferAttribute
+  _getParticlePositions(elapsedTime) {
+    return Float32Array.from(this.particles.
+    flatMap(p => {
+      // Get position
+      let [x, y, z] = p.position(elapsedTime);
+      // Scale X coordinates to make sure simulation fits viewport
+      // Aspect ratio of 0.95 requires no adjustment; we scale X coords based on this ideal
+      const { aspect } = this.camera || { aspect: 1.5 };
+      const scaleFactor = aspect / 0.95;
+      const xScale = Math.max(scaleFactor, 1); // don't squish, only stretch
+      x = x * xScale - (xScale - 1) / 2;
+      // Scale all coordinates from (0, 1) bounds to (-1, 1) bounds
+      return [x, y, z].map(c => c * 2 - 1);
+    }));
+  }
+
   render() {
     this.stats.update();
     const time = this.elapsedTime;
 
-    const positions = Float32Array.from(this.particles.flatMap(p => p.position(this.elapsedTime).map(c => c * 2 - 1)));
+    const positions = this._getParticlePositions(this.elapsedTime);
     this.points.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
     this.renderer.render(this.scene, this.camera);
