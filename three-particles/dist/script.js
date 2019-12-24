@@ -1,4 +1,4 @@
-NUM_PARTICLES = 2500;
+NUM_PARTICLES = 2750;
 
 // Averages multiple random values to simulate gaussian distribution. Higher values of n result in
 // a tighter focus.
@@ -22,8 +22,8 @@ class Particle {
     this.z = gaussRand() * .5 - .25; // z position from -0.25 to 0.25
     // Visual properties
     this.opacity = Math.random() * .5 + .15; // opacity from 0.15 to 0.65
-    this.size = (Math.random() ** 2 * 5 + 4) // size from 4px to 9px (focused lower)
-      * window.devicePixelRatio; // same size range on all screens
+    this.size = (Math.random() ** 2 * 5 + 4) * // size from 4px to 9px (focused lower)
+    window.devicePixelRatio; // same size range on all screens
   }
 
   position(time) {
@@ -47,24 +47,29 @@ const cameraDistance = 1.5;
 
 const vertexShader = `
 attribute float size;
+attribute float particleOpacity;
+
+varying float opacity;
 
 void main() {
-    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    opacity = particleOpacity;
 
     // Appear at 1x scale from a distance of 1.5
     float scale = 3. / (${cameraDistance.toFixed(5)} + 1.5);
     gl_PointSize = size * scale;
 
-    gl_Position = projectionMatrix * mvPosition;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `;
 
 const fragmentShader = `
+varying float opacity;
+
 void main() {
     vec2 st = gl_PointCoord;
     float distanceFromCenter = distance(gl_PointCoord, vec2(0.5, 0.5));
     float inCircle = 1. - smoothstep(0.45, 0.55, distanceFromCenter);
-    gl_FragColor = mix(vec4(0., 0., 0., 0.), vec4 (1., 1., 1., .25), inCircle);
+    gl_FragColor = mix(vec4(1., 1., 1., 0.), vec4 (1., 1., 1., opacity), inCircle);
 }
 `;
 
@@ -85,8 +90,14 @@ class ParticleRenderer {
     'position',
     new THREE.BufferAttribute(Float32Array.from(initialPositions), 3));
 
-    const sizes = this.particles.map(p => p.size);
-    this.points.setAttribute('size', new THREE.BufferAttribute(Float32Array.from(sizes), 1));
+    const sizes = new Float32Array(this.particles.length);
+    const opacities = new Float32Array(this.particles.length);
+    this.particles.forEach((p, i) => {
+      sizes[i] = p.size;
+      opacities[i] = p.opacity;
+    });
+    this.points.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+    this.points.setAttribute('particleOpacity', new THREE.BufferAttribute(opacities, 1));
     // Define material
     const material = new THREE.ShaderMaterial({
       uniforms: {},
