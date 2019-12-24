@@ -61,7 +61,10 @@ void main() {
 
 const fragmentShader = `
 void main() {
-    gl_FragColor = vec4(1., 1., 1., .25);
+    vec2 st = gl_PointCoord;
+    float distanceFromCenter = distance(gl_PointCoord, vec2(0.5, 0.5));
+    float inCircle = 1. - smoothstep(0.45, 0.55, distanceFromCenter);
+    gl_FragColor = mix(vec4(0., 0., 0., 0.), vec4 (1., 1., 1., .25), inCircle);
 }
 `;
 
