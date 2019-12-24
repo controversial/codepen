@@ -19,7 +19,7 @@ class Particle {
     this.frequency = 1; // every particle completes 1 cycle
     this.amplitude = gaussRand(7) * .2; // amplitude from 0 to .2
     this.yShift = gaussRand(20) * .6 - .3; // vertical shift from -.25 to .25
-    this.z = gaussRand() * .5 + .25;
+    this.z = gaussRand() * .5 - .25;
     // Visual properties
     this.opacity = Math.random() * .5 + .25; // opacity from .25 to .75
     this.size = Math.floor(Math.random() * 10 + 5); // size from 5px to 20px
@@ -43,14 +43,18 @@ class Particle {
 
 
 
-const cameraDistance = 2.5;
+const cameraDistance = 1.5;
 
 const vertexShader = `
 attribute float size;
 
 void main() {
     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-    gl_PointSize = size * (${cameraDistance} / -mvPosition.z);
+
+    // Appear at 1x scale from a distance of 1.5
+    float scale = 3. / (${cameraDistance.toFixed(5)} + 1.5);
+    gl_PointSize = size * scale;
+
     gl_Position = projectionMatrix * mvPosition;
 }
 `;
