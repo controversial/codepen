@@ -46,9 +46,11 @@ class Particle {
 const cameraDistance = 2.5;
 
 const vertexShader = `
+attribute float size;
+
 void main() {
     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-    gl_PointSize = 10. * (${cameraDistance} / -mvPosition.z);
+    gl_PointSize = size * (${cameraDistance} / -mvPosition.z);
     gl_Position = projectionMatrix * mvPosition;
 }
 `;
@@ -75,6 +77,9 @@ class ParticleRenderer {
     this.points.setAttribute(
     'position',
     new THREE.BufferAttribute(Float32Array.from(initialPositions), 3));
+
+    const sizes = this.particles.map(p => p.size);
+    this.points.setAttribute('size', new THREE.BufferAttribute(Float32Array.from(sizes), 1));
     // Define material
     const material = new THREE.ShaderMaterial({
       uniforms: {},
