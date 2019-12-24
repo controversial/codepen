@@ -17,11 +17,11 @@ class Particle {
     this.startProgress = Math.random(); // starting position from 0 to 1
     this.speed = Math.random() * .08 + .02; // speed from 0.02 to 0.1
     this.frequency = 1; // every particle completes 1 cycle
-    this.amplitude = gaussRand(7) * .2; // amplitude from 0 to 0.2
+    this.amplitude = gaussRand(9) * .15; // amplitude from 0 to 0.15
     this.yShift = gaussRand(20) * .6 - .3; // vertical shift from -0.3 to 0.3
     // Visual properties
     this.opacity = Math.random() * .5 + .15; // opacity from 0.15 to 0.65
-    this.size = (Math.random() ** 2 * 5 + 4) * // size from 4px to 9px (focused lower)
+    this.size = (Math.random() * 6 + 1) // size from 1px to 7px
     window.devicePixelRatio; // same size range on all screens
   }
 
@@ -29,7 +29,7 @@ class Particle {
     const progress = (this.startProgress + time * this.speed) % 1;
     return [
     progress,
-    0.5 + this.yShift + this.amplitude * Math.sin(progress * this.frequency * 2 * Math.PI),
+    0.5 + this.yShift - this.amplitude * Math.sin(progress * this.frequency * 2 * Math.PI),
     0];
 
   }}
